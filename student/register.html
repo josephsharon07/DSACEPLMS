@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Registration - DSACE LMS</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="../css/styles.css">
+    <style>
+        body {
+            background-image: url('/images/background.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+        }
+
+        .glass-morphism {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+        }
+
+        .camera-container {
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
+            border-radius: 1.5rem;
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        .camera-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border: 3px solid #4F46E5;
+            border-radius: 1.5rem;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .camera-guide {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 200px;
+            height: 200px;
+            border: 2px dashed #4F46E5;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 11;
+        }
+
+        #video {
+            width: 100%;
+            border-radius: 1.5rem;
+            background-color: #1E293B;
+            transform: scale(1.02);
+        }
+
+        .input-field {
+            transition: all 0.3s ease;
+        }
+
+        .input-field:focus {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2);
+        }
+
+        .button-primary {
+            background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
+            transition: all 0.3s ease;
+        }
+
+        .button-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(79, 70, 229, 0.3);
+        }
+
+        .button-secondary {
+            background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+        }
+
+        .floating-label {
+            transform: translateY(-1.5rem);
+            font-size: 0.875rem;
+            color: #4F46E5;
+            transition: all 0.3s ease;
+        }
+
+        .progress-steps {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+
+        .step {
+            width: 2rem;
+            height: 2rem;
+            border-radius: 50%;
+            background: #E0E7FF;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 1rem;
+            position: relative;
+        }
+
+        .step.active {
+            background: #4F46E5;
+            color: white;
+        }
+
+        .step::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            background: #E0E7FF;
+            right: -100%;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .step:last-child::after {
+            display: none;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(79, 70, 229, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(79, 70, 229, 0); }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header with improved styling -->
+    <header class="bg-gradient-to-r from-indigo-600 via-indigo-700 to-purple-800 text-white shadow-lg fixed w-full z-50">
+        <div class="container mx-auto px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+                <a href="../index.html" class="home-link">
+                    <img src="../images/college_logo.png" alt="College Logo" class="h-16 rounded-full shadow-md">
+                </a>
+                <div>
+                    <h1 class="text-2xl md:text-3xl font-bold leading-tight">Dr. Sivanthi Aditanar College of Engineering</h1>
+                    <p class="text-indigo-200">Department of Computer Science and Engineering</p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main content -->
+    <main class="container mx-auto px-4 pt-32 pb-8">
+        <div class="max-w-3xl mx-auto glass-morphism rounded-2xl overflow-hidden">
+            <div class="p-8">
+                <h2 class="text-3xl font-bold mb-8 text-center bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600">
+                    Student Registration
+                </h2>
+
+                <!-- Progress steps -->
+                <div class="progress-steps mb-8">
+                    <div class="step active">1</div>
+                    <div class="step">2</div>
+                    <div class="step">3</div>
+                </div>
+
+                <form id="registrationForm" class="space-y-8">
+                    <!-- Personal Information Section -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="relative">
+                            <label for="regNumber" class="absolute -top-2 left-2 px-1 bg-white text-xs font-medium text-indigo-600">
+                                Register Number
+                            </label>
+                            <input type="text" id="regNumber" name="regNumber" required
+                                class="input-field w-full px-4 py-3 border-2 border-indigo-100 rounded-xl focus:border-indigo-500 focus:outline-none bg-white">
+                        </div>
+
+                        <div class="relative">
+                            <label for="name" class="absolute -top-2 left-2 px-1 bg-white text-xs font-medium text-indigo-600">
+                                Full Name
+                            </label>
+                            <input type="text" id="name" name="name" required
+                                class="input-field w-full px-4 py-3 border-2 border-indigo-100 rounded-xl focus:border-indigo-500 focus:outline-none bg-white">
+                        </div>
+
+                        <div class="relative">
+                            <label for="year" class="absolute -top-2 left-2 px-1 bg-white text-xs font-medium text-indigo-600">
+                                Current Year
+                            </label>
+                            <select id="year" name="year" required
+                                class="input-field w-full px-4 py-3 border-2 border-indigo-100 rounded-xl focus:border-indigo-500 focus:outline-none bg-white appearance-none">
+                                <option value="">Select Year</option>
+                                <option value="1">1st Year</option>
+                                <option value="2">2nd Year</option>
+                                <option value="3">3rd Year</option>
+                                <option value="4">4th Year</option>
+                            </select>
+                            <div class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                                <i class="fas fa-chevron-down text-gray-400"></i>
+                            </div>
+                        </div>
+
+                        <div class="relative">
+                            <label for="department" class="absolute -top-2 left-2 px-1 bg-white text-xs font-medium text-indigo-600">
+                                Department
+                            </label>
+                            <input type="text" id="department" name="department" required
+                                class="input-field w-full px-4 py-3 border-2 border-indigo-100 rounded-xl focus:border-indigo-500 focus:outline-none bg-white">
+                        </div>
+                    </div>
+
+                    <!-- Camera Section -->
+                    <div class="camera-section mt-12 bg-indigo-50 p-6 rounded-xl">
+                        <h3 class="text-xl font-semibold text-indigo-900 mb-4 flex items-center">
+                            <i class="fas fa-camera mr-2"></i>
+                            Face Recognition Setup
+                        </h3>
+                        <p class="text-sm text-indigo-600 mb-6 flex items-center">
+                            <i class="fas fa-info-circle mr-2"></i>
+                            Please ensure you're in a well-lit area and look directly at the camera
+                        </p>
+
+                        <div class="camera-container mb-6 relative">
+                            <div class="camera-overlay"></div>
+                            <div class="camera-guide"></div>
+                            <video id="video" autoplay playsinline></video>
+                            <canvas id="canvas" class="hidden"></canvas>
+                        </div>
+
+                        <div class="flex justify-center space-x-4 mt-6">
+                            <button type="button" id="startCamera"
+                                class="button-primary px-6 py-3 text-white rounded-xl flex items-center space-x-2 pulse">
+                                <i class="fas fa-video mr-2"></i>
+                                <span>Start Camera</span>
+                            </button>
+                            <button type="button" id="captureBtn"
+                                class="button-primary button-secondary px-6 py-3 text-white rounded-xl flex items-center space-x-2" disabled>
+                                <i class="fas fa-camera mr-2"></i>
+                                <span>Capture Image</span>
+                            </button>
+                        </div>
+
+                        <div id="captureStatus" class="mt-6 text-center hidden">
+                            <div class="flex items-center justify-center p-4 rounded-lg bg-white">
+                                <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-indigo-600 mr-2"></div>
+                                <span id="captureMessage" class="font-medium"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="flex justify-center mt-10">
+                        <button type="submit" id="submitBtn"
+                            class="button-primary px-8 py-4 text-white text-lg font-medium rounded-xl flex items-center space-x-2" disabled>
+                            <i class="fas fa-user-plus mr-2"></i>
+                            <span>Complete Registration</span>
+                        </button>
+                    </div>
+                </form>
+
+                <div class="text-center border-t pt-6">
+                    <p class="text-gray-600 mb-2">Already have an account?</p>
+                    <a href="../student/login.html" 
+                        class="inline-flex items-center text-indigo-600 hover:text-indigo-800 transition-colors duration-200">
+                        <span>Login to your account</span>
+                        <i class="fas fa-arrow-right ml-2"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+<script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const userId = localStorage.getItem('currentUser');
+            if (userId) {
+                const isConfirmed = localStorage.getItem('confirmUser');
+                if (!isConfirmed) {
+                    window.location.href = 'confirm.html';
+                } else {
+                    window.location.href = 'index.html';
+                }
+                return;
+            }
+
+            // Load face-api.js models
+            Promise.all([
+                faceapi.nets.faceRecognitionNet.loadFromUri('/models'),
+                faceapi.nets.faceLandmark68Net.loadFromUri('/models'),
+                faceapi.nets.ssdMobilenetv1.loadFromUri('/models')
+            ]).then(() => {
+                console.log('Face detection models loaded');
+            }).catch(err => {
+                console.error('Error loading face detection models:', err);
+            });
+        });
+
+        function generateRandomString(length = 16) {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            let result = '';
+            for (let i = 0; i < length; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return result;
+        }
+        let video = document.getElementById('video');
+        let canvas = document.getElementById('canvas');
+        let captureBtn = document.getElementById('captureBtn');
+        let startCameraBtn = document.getElementById('startCamera');
+        let submitBtn = document.getElementById('submitBtn');
+        let captureStatus = document.getElementById('captureStatus');
+        let captureMessage = document.getElementById('captureMessage');
+        let stream = null;
+        let faceId = null;
+        let faceFeatures = null;
+
+        // Start camera
+        startCameraBtn.addEventListener('click', async () => {
+            try {
+                // First check if getUserMedia is supported
+                if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                    throw new Error('Your browser does not support camera access');
+                }
+                
+                // Set up constraints with explicit width and height
+                const constraints = {
+                    video: {
+                        width: { ideal: 640 },
+                        height: { ideal: 480 },
+                        facingMode: "user"
+                    }
+                };
+                
+                stream = await navigator.mediaDevices.getUserMedia(constraints);
+                
+                // Ensure the video element is properly initialized
+                video.srcObject = stream;
+                video.onloadedmetadata = () => {
+                    video.play();
+                    console.log("Camera started successfully");
+                };
+                
+                startCameraBtn.disabled = true;
+                captureBtn.disabled = false;
+            } catch (err) {
+                console.error('Error accessing camera:', err);
+                alert('Unable to access camera: ' + err.message + '. Please ensure you have granted camera permissions and are using a secure connection (HTTPS).');
+            }
+        });
+
+        // Capture image
+        captureBtn.addEventListener('click', async () => {
+            if (!video.srcObject) {
+                alert("Camera not started. Please start the camera first.");
+                return;
+            }
+            
+            captureStatus.classList.remove('hidden');
+            captureMessage.textContent = 'Processing face...';
+            captureMessage.className = 'font-medium text-blue-600';
+            
+            try {
+                // Use face-api.js to detect and get face descriptor
+                const detections = await faceapi.detectSingleFace(video)
+                    .withFaceLandmarks()
+                    .withFaceDescriptor();
+                
+                if (!detections) {
+                    captureMessage.textContent = 'No face detected. Please try again.';
+                    captureMessage.className = 'font-medium text-red-600';
+                    return;
+                }
+                
+                // Get face descriptor (features)
+                const faceDescriptor = detections.descriptor;
+                
+                // Calculate facial distances between key landmarks
+                const landmarks = detections.landmarks;
+                const positions = landmarks.positions;
+                
+                // Calculate important facial distances
+                const distances = {
+                    // Eye distances
+                    interEyeDistance: calculateDistance(positions[39], positions[42]), // Distance between inner eye corners
+                    leftEyeWidth: calculateDistance(positions[36], positions[39]), // Left eye width
+                    rightEyeWidth: calculateDistance(positions[42], positions[45]), // Right eye width
+                    
+                    // Nose to mouth distances
+                    noseToUpperLip: calculateDistance(positions[33], positions[51]), // Nose tip to upper lip
+                    noseToChin: calculateDistance(positions[33], positions[8]), // Nose tip to chin
+                    
+                    // Mouth metrics
+                    mouthWidth: calculateDistance(positions[48], positions[54]), // Mouth width
+                    mouthHeight: calculateDistance(positions[51], positions[57]), // Mouth height
+                    
+                    // Face shape metrics
+                    faceHeight: calculateDistance(positions[27], positions[8]), // Forehead to chin
+                    faceWidth: calculateDistance(positions[0], positions[16]), // Face width at jawline
+                    
+                    // Eye to eyebrow distances
+                    leftEyeToEyebrow: calculateDistance(positions[37], positions[19]), // Left eye to left eyebrow
+                    rightEyeToEyebrow: calculateDistance(positions[44], positions[24]) // Right eye to right eyebrow
+                };
+                
+                // Function to calculate distance between two points
+                function calculateDistance(point1, point2) {
+                    return Math.sqrt(
+                        Math.pow(point1.x - point2.x, 2) +
+                        Math.pow(point1.y - point2.y, 2)
+                    );
+                }
+                
+                // Draw the face on canvas for visual feedback
+                const context = canvas.getContext('2d');
+                canvas.width = video.videoWidth || 640;
+                canvas.height = video.videoHeight || 480;
+                context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                
+                // Generate a unique face ID
+                faceId = generateRandomString(20);
+                
+                // Convert descriptor to base64 string for storage
+                faceFeatures = JSON.stringify(Array.from(faceDescriptor));
+                
+                // Store face features and distances in Supabase
+                const faceData = {
+                    id: faceId,
+                    features: faceFeatures,
+                    distances: distances // Store calculated facial distances
+                };
+                
+                const response = await fetch('https://kkanhwtltfaeduhsflmu.supabase.co/rest/v1/faces', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtrYW5od3RsdGZhZWR1aHNmbG11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM4NTc3MjUsImV4cCI6MjA1OTQzMzcyNX0.94kQ39S4LXMc_6E_gdspXyDz3dkPCubxLsGSV_2FPls',
+                        'Prefer': 'return=minimal'
+                    },
+                    body: JSON.stringify(faceData)
+                });
+                
+                if (response.ok) {
+                    captureMessage.textContent = 'Face registered successfully!';
+                    captureMessage.className = 'font-medium text-green-600';
+                    submitBtn.disabled = false;
+                    
+                    // Stop the camera
+                    if (stream) {
+                        stream.getTracks().forEach(track => track.stop());
+                    }
+                    video.srcObject = null;
+                } else {
+                    const errorData = await response.json();
+                    captureMessage.textContent = 'Failed to store face data: ' + (errorData.message || 'Unknown error');
+                    captureMessage.className = 'font-medium text-red-600';
+                }
+            } catch (err) {
+                console.error('Error processing face:', err);
+                captureMessage.textContent = 'Error processing face: ' + err.message;
+                captureMessage.className = 'font-medium text-red-600';
+            }
+        });
+
+        // Handle form submission
+        document.getElementById('registrationForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            if (!faceId) {
+                alert('Please capture your face image first');
+                return;
+            }
+
+            const formData = {
+                id: generateRandomString(),
+                regNumber: document.getElementById('regNumber').value,
+                name: document.getElementById('name').value,
+                year: document.getElementById('year').value,
+                department: document.getElementById('department').value,
+                faceId: faceId
+            };
+
+            try {
+                // Store user data in Supabase
+                const response = await fetch('https://kkanhwtltfaeduhsflmu.supabase.co/rest/v1/students', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtrYW5od3RsdGZhZWR1aHNmbG11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM4NTc3MjUsImV4cCI6MjA1OTQzMzcyNX0.94kQ39S4LXMc_6E_gdspXyDz3dkPCubxLsGSV_2FPls',
+                        'Prefer': 'return=minimal'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                if (response.ok) {
+                    alert('Registration successful! You can now select your semester.');
+                    window.location.href = 'index.html';
+                } else {
+                    const errorData = await response.json();
+                    alert('Registration failed: ' + (errorData.message || 'Unknown error'));
+                }
+            } catch (err) {
+                console.error('Error saving user data:', err);
+                alert('Network error. Please try again.');
+            }
+        });
+    </script>
+</body>
+</html>

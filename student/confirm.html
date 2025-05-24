@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirm Login - DSACE LMS</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="../css/styles.css" rel="stylesheet">
+    <style>
+        
+        .info-card {
+            transition: all 0.3s ease;
+        }
+
+        .info-label {
+            color: #4B5563;
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .info-value {
+            color: #1F2937;
+            font-weight: 600;
+            font-size: 1.125rem;
+            padding: 0.75rem;
+            background: #F9FAFB;
+            border: 1px solid #E5E7EB;
+            border-radius: 0.5rem;
+        }
+
+        .profile-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 2rem;
+            color: white;
+            font-size: 2rem;
+            box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2);
+        }
+
+        .content-container {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(8px);
+        }
+
+        .glass-morphism {
+            background: rgba(255, 255, 255, 0.98);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+
+        .button-primary {
+            transition: all 0.3s ease;
+        }
+
+        .button-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .loading {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+        }
+    </style>
+    <script src="js/auth.js"></script>
+</head>
+<body class="bg-gray-100">
+    <!-- Header with improved styling -->
+    <header class="bg-gradient-to-r from-indigo-600 via-indigo-700 to-purple-800 text-white shadow-lg fixed w-full z-50">
+        <div class="container mx-auto px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+                <img src="../images/college_logo.png" alt="College Logo" class="h-16 rounded-full shadow-md">
+                <div>
+                    <h1 class="text-2xl md:text-3xl font-bold leading-tight">Dr. Sivanthi Aditanar College of Engineering</h1>
+                    <p class="text-indigo-200">Department of Computer Science and Engineering</p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main content -->
+    <main class="container mx-auto px-4 pt-32 pb-8">
+        <div class="content-container">
+            <div class="max-w-2xl mx-auto">
+                <div class="profile-icon">
+                    <i class="fas fa-user-check"></i>
+                </div>
+
+                <h2 class="text-3xl font-bold mb-8 text-center bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600">
+                    Confirm Your Details
+                </h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
+                    <div class="space-y-2">
+                        <p class="info-label flex items-center">
+                            <i class="fas fa-id-card mr-2 text-indigo-600"></i>
+                            Register Number
+                        </p>
+                        <p id="registerNumber" class="info-value"></p>
+                    </div>
+                    <div class="space-y-2">
+                        <p class="info-label flex items-center">
+                            <i class="fas fa-user mr-2 text-indigo-600"></i>
+                            Name
+                        </p>
+                        <p id="name" class="info-value"></p>
+                    </div>
+                    <div class="space-y-2">
+                        <p class="info-label flex items-center">
+                            <i class="fas fa-building-columns mr-2 text-indigo-600"></i>
+                            Department
+                        </p>
+                        <p id="department" class="info-value"></p>
+                    </div>
+                    <div class="space-y-2">
+                        <p class="info-label flex items-center">
+                            <i class="fas fa-graduation-cap mr-2 text-indigo-600"></i>
+                            Year
+                        </p>
+                        <p id="year" class="info-value"></p>
+                    </div>
+                </div>
+                
+                <div class="flex justify-center space-x-6">
+                    <button type="button" id="notyou" 
+                        class="button-primary px-6 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl flex items-center space-x-2">
+                        <i class="fas fa-times-circle mr-2"></i>
+                        <span>Not You?</span>
+                    </button>
+                    <button type="button" id="confirm" 
+                        class="button-primary px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl flex items-center space-x-2">
+                        <i class="fas fa-check-circle mr-2"></i>
+                        <span>Confirm Details</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Keep the original JavaScript with some enhancements -->
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const userId = localStorage.getItem('currentUser');
+            if (!userId) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            try {
+                const id = localStorage.getItem('currentUser');
+
+                async function fetchUserData(id) {
+                    // Add loading state
+                    ['registerNumber', 'name', 'department', 'year'].forEach(field => {
+                        document.getElementById(field).classList.add('loading');
+                        document.getElementById(field).style.minHeight = '2.5rem';
+                    });
+
+                    const userResponse = await fetch(`https://kkanhwtltfaeduhsflmu.supabase.co/rest/v1/students?id=eq.${id}`, {
+                        method: 'GET',
+                        headers: {
+                            'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtrYW5od3RsdGZhZWR1aHNmbG11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM4NTc3MjUsImV4cCI6MjA1OTQzMzcyNX0.94kQ39S4LXMc_6E_gdspXyDz3dkPCubxLsGSV_2FPls'
+                        }
+                    });
+                    const userData = await userResponse.json();
+                    
+                    // Remove loading state and update content
+                    ['registerNumber', 'name', 'department', 'year'].forEach(field => {
+                        document.getElementById(field).classList.remove('loading');
+                    });
+
+                    document.getElementById('registerNumber').innerText = userData[0].regNumber;
+                    document.getElementById('name').innerText = userData[0].name;
+                    document.getElementById('department').innerText = userData[0].department;
+                    document.getElementById('year').innerText = `${userData[0].year}${getSuffix(userData[0].year)} Year`;
+                }
+
+                function getSuffix(year) {
+                    const suffixes = {
+                        '1': 'st',
+                        '2': 'nd',
+                        '3': 'rd',
+                        '4': 'th'
+                    };
+                    return suffixes[year] || 'th';
+                }
+
+                fetchUserData(id);
+            } catch (error) {
+                console.error('Error fetching user data:', error);
+                window.location.href = 'login.html';
+            }
+        });
+
+        function logout() {
+            localStorage.clear();
+            window.location.href = '../index.html';
+        }
+
+        document.getElementById('confirm').addEventListener('click', async () => {
+            localStorage.setItem('confirmUser', 'true');
+            window.location.href = 'index.html';
+        });
+        document.getElementById('notyou').addEventListener('click', logout);
+        document.getElementById('logoutBtn').addEventListener('click', logout);
+    </script>
+</body>
+</html>

@@ -1,0 +1,343 @@
+/* Base styles for all pages */
+body {
+    background-image: url('../images/background.jpg');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    font-family: 'Inter', sans-serif;
+    color: #1F2937;
+}
+
+.content-container {
+    background: rgb(255, 255, 255);
+    border-radius: 1rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+    margin: 2rem auto;
+    padding: 2rem;
+    position: relative;
+    width: 95%;
+    max-width: 1200px;
+}
+
+body::before {
+    content: none;
+}
+
+.glass-effect {
+    background: rgb(255, 255, 255);
+    border-radius: 1rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    padding: 1rem;
+}
+
+.nav-bar {
+    background: rgb(255, 255, 255);
+    border-bottom: 1px solid rgba(209, 213, 219, 1);
+    box-shadow: 0 4px 6px -1px rgba(31, 38, 135, 0.1);
+}
+
+/* Common button styles */
+.button-primary {
+    background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
+    transition: all 0.3s ease;
+    transform: translateY(0);
+    box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2);
+    color: white;
+    position: relative;
+    overflow: hidden;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.button-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 12px -1px rgba(79, 70, 229, 0.3);
+}
+
+.button-secondary {
+    background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+    color: white;
+    position: relative;
+    overflow: hidden;
+}
+
+.button-danger {
+    background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
+    color: white;
+}
+
+/* Common card styles */
+.card {
+    background: rgb(255, 255, 255);
+    border-radius: 1rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid rgba(209, 213, 219, 1);
+    padding: 1.5rem;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 20px -5px rgba(31, 38, 135, 0.15);
+}
+
+.info-card {
+    background: rgb(255, 255, 255);
+    border-radius: 1rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    margin-bottom: 1.5rem;
+    padding: 1.5rem;
+}
+
+/* Common animations */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.5s ease-in;
+}
+
+.pulse {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.4); }
+    70% { box-shadow: 0 0 0 10px rgba(79, 70, 229, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(79, 70, 229, 0); }
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.slide-in {
+    animation: slideIn 0.5s ease-out;
+}
+
+/* Modal styles */
+.modal {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+}
+
+.modal-content {
+    background: #FFFFFF;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 10px 15px -3px rgba(31, 38, 135, 0.15);
+    max-width: 90%;
+    width: 100%;
+    padding: 2rem;
+}
+
+/* Form elements */
+.input-field {
+    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(229, 231, 235, 0.5);
+}
+
+.input-field:focus {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2);
+    border-color: rgba(79, 70, 229, 0.5);
+}
+
+/* Form container styles */
+.form-container {
+    background: rgb(255, 255, 255);
+    border-radius: 1rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+    padding: 2rem;
+    margin: 2rem auto;
+    max-width: 500px;
+    width: 90%;
+}
+
+/* Table styles */
+.table-row-hover:hover {
+    background: rgba(0, 0, 0, 0.02);
+}
+
+/* Loading animation */
+.loading {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+/* Navigation button styles */
+.nav-button {
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.nav-button::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, rgba(255,255,255,0.1), rgba(255,255,255,0));
+    transform: translateX(-100%);
+    transition: transform 0.6s;
+}
+
+.nav-button:hover::after {
+    transform: translateX(100%);
+}
+
+/* Button Ripple Effect */
+.ripple {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.4);
+    transform: scale(0);
+    animation: ripple-animation 0.6s linear;
+    pointer-events: none;
+}
+
+@keyframes ripple-animation {
+    to {
+        transform: scale(4);
+        opacity: 0;
+    }
+}
+
+/* Tooltip Styles */
+.tooltip {
+    position: absolute;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    white-space: nowrap;
+    z-index: 50;
+    pointer-events: none;
+    transform: translateY(-100%);
+    margin-top: -0.5rem;
+    opacity: 0;
+    animation: tooltip-fade-in 0.2s ease forwards;
+}
+
+@keyframes tooltip-fade-in {
+    to {
+        opacity: 1;
+    }
+}
+
+/* Landing page specific styles */
+.hero-section {
+    position: relative;
+    padding: 6rem 0;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(8px);
+    border-radius: 2rem;
+    margin: 2rem 0;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.hero-title {
+    background: linear-gradient(135deg, #4F46E5, #7C3AED);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-size: 3.5rem;
+    font-weight: 800;
+    line-height: 1.2;
+    margin-bottom: 1.5rem;
+}
+
+/* Portal card styles */
+.portal-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    padding: 2rem;
+}
+
+.portal-card {
+    background: rgb(255, 255, 255);
+    border-radius: 1.5rem;
+    padding: 2rem;
+    text-align: center;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(209, 213, 219, 1);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.portal-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 25px -5px rgba(31, 38, 135, 0.15);
+}
+
+/* Fix for any url() paths in CSS */
+.logo {
+  background-image: url('../images/logo.png');
+}
+
+.icon-student {
+  background-image: url('../images/icons/student.png');
+}
+
+.icon-staff {
+  background-image: url('../images/icons/staff.png');
+}
+
+.icon-admin {
+  background-image: url('../images/icons/admin.png');
+}
+
+/* Enhanced responsiveness */
+@media (max-width: 768px) {
+    .content-container {
+        padding: 1rem;
+        margin: 1rem auto;
+    }
+
+    .hero-title {
+        font-size: 2.5rem;
+    }
+
+    .portal-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Improved accessibility */
+:focus {
+    outline: 2px solid #4F46E5;
+    outline-offset: 2px;
+}

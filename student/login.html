@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Login - DSACE LMS</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Change from defer to direct load with specific version -->
+    <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="../css/styles.css">
+    <style>
+        .camera-container {
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
+            border-radius: 1.5rem;
+            overflow: hidden;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            position: relative;
+        }
+
+        .camera-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border: 2px solid #4F46E5;
+            border-radius: 1.5rem;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        #video {
+            width: 100%;
+            border-radius: 1.5rem;
+            background-color: #1E293B;
+            transition: all 0.5s ease;
+            transform: scale(1.02);
+        }
+
+        .button-primary {
+            background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
+            transition: all 0.3s ease;
+            transform: translateY(0);
+            box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2);
+        }
+
+        .button-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 12px -1px rgba(79, 70, 229, 0.3);
+        }
+
+        .button-secondary {
+            background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(79, 70, 229, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(79, 70, 229, 0); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header with improved gradient and positioning -->
+    <header class="bg-gradient-to-r from-indigo-600 via-indigo-700 to-purple-800 text-white shadow-lg fixed w-full z-50">
+        <div class="container mx-auto px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+                <a href="../index.html" class="home-link">
+                    <img src="../images/college_logo.png" alt="College Logo" class="h-16 rounded-full shadow-md">
+                </a>
+                <div>
+                    <h1 class="text-2xl md:text-3xl font-bold leading-tight">Dr. Sivanthi Aditanar College of Engineering</h1>
+                    <p class="text-indigo-200">Staff Portal - Department of Computer Science and Engineering</p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main content with improved spacing and animations -->
+    <main class="container mx-auto px-4 pt-32 pb-8">
+        <div class="max-w-xl mx-auto glass-effect rounded-2xl overflow-hidden animate-fade-in">
+            <div class="p-8">
+                <h2 class="text-3xl font-bold mb-6 text-center bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600">
+                    Face Authentication
+                </h2>
+                
+                <div class="space-y-8">
+                    <div class="camera-section">
+                        <div class="flex items-center justify-center mb-6 text-gray-600">
+                            <i class="fas fa-camera mr-2"></i>
+                            <p class="text-sm">Please position your face within the frame</p>
+                        </div>
+                        
+                        <div class="camera-container mb-6 relative">
+                            <div class="camera-overlay"></div>
+                            <div class="camera-guide"></div>
+                            <video id="video" autoplay playsinline></video>
+                            <canvas id="canvas" class="hidden"></canvas>
+                        </div>
+                        
+                        <div class="flex justify-center space-x-4 mt-6">
+                            <button type="button" id="startCamera" 
+                                class="button-primary px-6 py-3 text-white rounded-xl flex items-center space-x-2 pulse">
+                                <i class="fas fa-video"></i>
+                                <span>Start Camera</span>
+                            </button>
+                            <button type="button" id="verifyBtn" 
+                                class="button-primary button-secondary px-6 py-3 text-white rounded-xl flex items-center space-x-2" disabled>
+                                <i class="fas fa-user-check"></i>
+                                <span>Verify Identity</span>
+                            </button>
+                        </div>
+                        
+                        <div id="verificationStatus" class="mt-6 text-center hidden">
+                            <div class="flex items-center justify-center p-4 rounded-lg bg-gray-50">
+                                <div id="loadingSpinner" class="animate-spin rounded-full h-5 w-5 border-b-2 border-indigo-600 mr-2"></div>
+                                <span id="verificationMessage" class="font-medium"></span>
+                            </div>
+                        </div>
+
+                        <div id="cameraStatus" class="mt-6 text-center hidden">
+                            <div class="flex items-center justify-center p-4 rounded-lg bg-gray-50">
+                                <span id="cameraMessage" class="font-medium"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-center border-t pt-6">
+                        <p class="text-gray-600 mb-2">New to our platform?</p>
+                        <a href="../student/register.html" 
+                            class="inline-flex items-center text-indigo-600 hover:text-indigo-800 transition-colors duration-200">
+                            <span>Register as a new student</span>
+                            <i class="fas fa-arrow-right ml-2"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const userId = localStorage.getItem('currentUser');
+            if (userId) {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            // Load face-api.js models
+            Promise.all([
+                faceapi.nets.faceRecognitionNet.loadFromUri('/models'),
+                faceapi.nets.faceLandmark68Net.loadFromUri('/models'),
+                faceapi.nets.ssdMobilenetv1.loadFromUri('/models')
+            ]).then(() => {
+                console.log('Face detection models loaded');
+            }).catch(err => {
+                console.error('Error loading face detection models:', err);
+            });
+            
+            // Get DOM elements and initialize once DOM is loaded
+            const video = document.getElementById('video');
+            const canvas = document.getElementById('canvas');
+            const startCameraBtn = document.getElementById('startCamera');
+            const verifyBtn = document.getElementById('verifyBtn');
+            const cameraStatus = document.getElementById('cameraStatus');
+            const cameraMessage = document.getElementById('cameraMessage');
+            let stream = null;
+            let allFaces = [];
+
+            // Start camera - Make sure event listener is only added if element exists
+            if (startCameraBtn) {
+                startCameraBtn.addEventListener('click', async () => {
+                    try {
+                        // First check if getUserMedia is supported
+                        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                            throw new Error('Your browser does not support camera access');
+                        }
+                        
+                        // Set up constraints with explicit width and height
+                        const constraints = {
+                            video: {
+                                width: { ideal: 640 },
+                                height: { ideal: 480 },
+                                facingMode: "user"
+                            }
+                        };
+                        
+                        stream = await navigator.mediaDevices.getUserMedia(constraints);
+                        
+                        // Ensure the video element is properly initialized
+                        video.srcObject = stream;
+                        video.onloadedmetadata = () => {
+                            video.play();
+                            console.log("Camera started successfully");
+                        };
+                        
+                        // Preload all face data
+                        await loadAllFaceData();
+                        
+                        if (startCameraBtn) startCameraBtn.disabled = true;
+                        if (verifyBtn) verifyBtn.disabled = false;
+                        if (cameraStatus) cameraStatus.classList.remove('hidden');
+                        if (cameraMessage) cameraMessage.textContent = 'Camera active. Click "Verify" to authenticate.';
+                    } catch (err) {
+                        console.error('Error accessing camera:', err);
+                        alert('Unable to access camera: ' + err.message + '. Please ensure you have granted camera permissions and are using a secure connection (HTTPS).');
+                    }
+                });
+            }
+            
+            // Load all face data from Supabase
+            async function loadAllFaceData() {
+                try {
+                    if (!cameraStatus || !cameraMessage) return;
+                    
+                    cameraStatus.classList.remove('hidden');
+                    cameraMessage.textContent = 'Loading face database...';
+                    cameraMessage.className = 'font-medium text-blue-600';
+                    
+                    // Fix the API key header - changed "rose" to "role"
+                    const facesResponse = await fetch('https://kkanhwtltfaeduhsflmu.supabase.co/rest/v1/faces', {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtrYW5od3RsdGZhZWR1aHNmbG11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM4NTc3MjUsImV4cCI6MjA1OTQzMzcyNX0.94kQ39S4LXMc_6E_gdspXyDz3dkPCubxLsGSV_2FPls',
+                        }
+                    });
+                    
+                    const facesData = await facesResponse.json();
+                    
+                    if (!facesData || facesData.length === 0) {
+                        cameraMessage.textContent = 'No face data found in the database.';
+                        cameraMessage.className = 'font-medium text-red-600';
+                        return;
+                    }
+                    
+                    console.log(`Loaded ${facesData.length} faces from database`);
+                    
+                    // Process each face and create LabeledFaceDescriptors
+                    allFaces = facesData.map(face => {
+                        const descriptor = JSON.parse(face.features);
+                        return {
+                            id: face.id,
+                            descriptor: new Float32Array(descriptor)
+                        };
+                    });
+                    
+                    cameraMessage.textContent = `Loaded ${allFaces.length} face profiles. Ready for verification.`;
+                    cameraMessage.className = 'font-medium text-green-600';
+                } catch (err) {
+                    console.error('Error loading face data:', err);
+                    if (cameraMessage) {
+                        cameraMessage.textContent = 'Error loading face database: ' + err.message;
+                        cameraMessage.className = 'font-medium text-red-600';
+                    }
+                }
+            }
+
+            // Authenticate user - Make sure event listener is only added if element exists
+            if (verifyBtn) {
+                verifyBtn.addEventListener('click', async () => {
+                    if (!video || !video.srcObject) {
+                        alert("Camera not started. Please start the camera first.");
+                        return;
+                    }
+                    
+                    if (allFaces.length === 0) {
+                        alert('Face database not loaded. Please try again.');
+                        return;
+                    }
+                    
+                    if (!cameraStatus || !cameraMessage) return;
+                    
+                    cameraStatus.classList.remove('hidden');
+                    cameraMessage.textContent = 'Analyzing your face...';
+                    cameraMessage.className = 'font-medium text-blue-600';
+                    
+                    try {
+                        // Detect face in current video frame
+                        const detections = await faceapi.detectSingleFace(video)
+                            .withFaceLandmarks()
+                            .withFaceDescriptor();
+                        
+                        if (!detections) {
+                            cameraMessage.textContent = 'No face detected. Please ensure your face is clearly visible.';
+                            cameraMessage.className = 'font-medium text-red-600';
+                            return;
+                        }
+                        
+                        // Draw the face on canvas for visual feedback
+                        if (canvas) {
+                            const context = canvas.getContext('2d');
+                            canvas.width = video.videoWidth || 640;
+                            canvas.height = video.videoHeight || 480;
+                            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                            canvas.classList.remove('hidden');
+                        }
+                        
+                        // Get the current face descriptor
+                        const currentFaceDescriptor = detections.descriptor;
+                        
+                        // Find the best match among all faces
+                        let bestMatch = { distance: 1.0, faceId: null };
+                        
+                        for (const face of allFaces) {
+                            // Calculate Euclidean distance
+                            const distance = faceapi.euclideanDistance(currentFaceDescriptor, face.descriptor);
+                            
+                            if (distance < bestMatch.distance) {
+                                bestMatch = {
+                                    distance,
+                                    faceId: face.id
+                                };
+                            }
+                        }
+                        
+                        console.log('Best match:', bestMatch);
+                        
+                        // If the match is good enough (lower distance is better)
+                        if (bestMatch.distance < 0.6) { // Using slightly higher threshold for better matching
+                            cameraMessage.textContent = 'Face recognized! Logging you in...';
+                            cameraMessage.className = 'font-medium text-green-600';
+                            
+                            // Get student info based on recognized face ID
+                            const studentResponse = await fetch(`https://kkanhwtltfaeduhsflmu.supabase.co/rest/v1/students?faceId=eq.${bestMatch.faceId}`, {
+                                method: 'GET',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtrYW5od3RsdGZhZWR1aHNmbG11Iiwicm9zZSI6ImFub24iLCJpYXQiOjE3NDM4NTc3MjUsImV4cCI6MjA1OTQzMzcyNX0.94kQ39S4LXMc_6E_gdspXyDz3dkPCubxLsGSV_2FPls',
+                                }
+                            });
+                            
+                            const studentData = await studentResponse.json();
+                            
+                            if (!studentData || studentData.length === 0) {
+                                cameraMessage.textContent = 'Face recognized but student data not found. Please contact administrator.';
+                                cameraMessage.className = 'font-medium text-red-600';
+                                console.log('Student data not found for faceId:', bestMatch.faceId);
+                                console.log('API response:', studentData);
+                                return;
+                            }
+                            
+                            const student = studentData[0];
+                            
+                            // Store user data in localStorage
+                            localStorage.setItem('currentUser', student.id);
+                            localStorage.setItem('userName', student.name);
+                            localStorage.setItem('userRegNumber', student.regNumber);
+                            localStorage.setItem('userDepartment', student.department);
+                            localStorage.setItem('userYear', student.year);
+                            
+                            // Stop the camera
+                            if (stream) {
+                                stream.getTracks().forEach(track => track.stop());
+                            }
+                            
+                            // Show welcome message with student name
+                            cameraMessage.textContent = `Welcome, ${student.name}! Redirecting...`;
+                            
+                            setTimeout(() => {
+                                window.location.href = 'index.html';
+                            }, 1500);
+                        } else {
+                            cameraMessage.textContent = 'Face verification failed. No matching user found.';
+                            cameraMessage.className = 'font-medium text-red-600';
+                        }
+                        
+                    } catch (err) {
+                        console.error('Authentication error:', err);
+                        cameraMessage.textContent = 'Error authenticating: ' + err.message;
+                        cameraMessage.className = 'font-medium text-red-600';
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document Viewer - DSACE LMS</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="../css/styles.css" rel="stylesheet">
+    <style>
+        body {
+            background-image: url('../images/background_notes.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+
+        .glass-morphism {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+        }
+
+        .viewer-container {
+            background: white;
+            border-radius: 1.5rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            border: 1px solid rgba(229, 231, 235, 0.5);
+        }
+
+        .nav-button {
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-button::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, rgba(255,255,255,0.1), rgba(255,255,255,0));
+            transform: translateX(-100%);
+            transition: transform 0.6s;
+        }
+
+        .nav-button:hover::after {
+            transform: translateX(100%);
+        }
+
+        .loading-spinner {
+            border: 4px solid rgba(79, 70, 229, 0.1);
+            border-left-color: #4F46E5;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .document-header {
+            background: linear-gradient(to right, #F9FAFB, #F3F4F6);
+            border-bottom: 1px solid rgba(229, 231, 235, 0.5);
+        }
+
+        .file-icon {
+            width: 2.5rem;
+            height: 2.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0.75rem;
+            background: linear-gradient(135deg, #EEF2FF 0%, #E0E7FF 100%);
+        }
+
+        .iframe-container {
+            position: relative;
+            background: #F9FAFB;
+            min-height: calc(100vh - 12rem);
+        }
+
+        .youtube-container {
+            position: relative;
+            width: 100%;
+            padding-bottom: 56.25%; /* 16:9 aspect ratio */
+        }
+
+        .youtube-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+    <script src="js/auth.js"></script>
+</head>
+<body class="bg-gray-50">
+    <!-- Enhanced Navigation Bar -->
+    <nav class="bg-gradient-to-r from-indigo-600 via-indigo-700 to-purple-800 text-white shadow-lg fixed w-full z-50">
+        <div class="container mx-auto px-6">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center">
+                    <img src="../images/college_logo.png" alt="College Logo" class="h-14 mr-4 rounded-full shadow-md">
+                    <div>
+                        <h1 class="text-2xl font-bold leading-tight">Dr. Sivanthi Aditanar College of Engineering</h1>
+                        <p class="text-indigo-200">Department of Computer Science and Engineering</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-6">
+                    <span id="userName" class="font-medium text-lg flex items-center">
+                        <i class="fas fa-user-circle mr-2"></i>
+                        <!-- Username will be set dynamically -->
+                    </span>
+                    <button onclick="history.back()" 
+                        class="nav-button px-4 py-2 bg-indigo-500 hover:bg-indigo-600 rounded-xl transition-all flex items-center">
+                        <i class="fas fa-arrow-left mr-2"></i>
+                        Back to Files
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-6 py-8 pt-28">
+        <div class="viewer-container">
+            <!-- Document Header -->
+            <div class="document-header p-6 flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <div class="file-icon" id="fileTypeIcon">
+                        <!-- Icon will be dynamically inserted -->
+                    </div>
+                    <div>
+                        <h2 id="docTitle" class="text-2xl font-bold text-gray-800"></h2>
+                        <p class="text-sm text-gray-500 mt-1" id="fileType"></p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button onclick="renameFile()" class="nav-button px-3 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-xl transition-all flex items-center">
+                        <i class="fas fa-edit mr-2"></i>
+                        Rename
+                    </button>
+                    <button onclick="deleteFile()" class="nav-button px-3 py-2 bg-red-500 hover:bg-red-600 text-white rounded-xl transition-all flex items-center">
+                        <i class="fas fa-trash-alt mr-2"></i>
+                        Delete
+                    </button>
+                    <span class="text-sm text-gray-500">Opened: April 18, 2025 14:35 UTC</span>
+                </div>
+            </div>
+
+            <!-- Document Viewer -->
+            <div class="iframe-container">
+                <div id="loadingIndicator" class="iframe-loading">
+                    <div class="text-center">
+                        <div class="loading-spinner w-12 h-12 rounded-full mx-auto mb-4"></div>
+                        <p class="text-indigo-600 font-medium">Loading document...</p>
+                    </div>
+                </div>
+                <div id="docContent" class="w-full" style="height: 750px;">
+                    <!-- Document content will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (!checkAuth()) return;
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const fileUrl = urlParams.get('url');
+            const fileName = urlParams.get('name');
+            
+            if (fileName.endsWith('.tube')) {
+                // Show loading state
+                document.body.innerHTML = `
+                    <div class="fixed inset-0 flex items-center justify-center bg-white">
+                        <div class="text-center">
+                            <div class="loading-spinner w-12 h-12 rounded-full mx-auto mb-4"></div>
+                            <p class="text-indigo-600 font-medium">Opening YouTube video...</p>
+                        </div>
+                    </div>
+                `;
+                
+                try {
+                    const response = await fetch(fileUrl, {
+                        headers: {
+                            'Authorization': 'Bearer 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',
+                            'Accept': 'application/vnd.github.v3.raw'
+                        }
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch YouTube URL');
+                    }
+                    
+                    const youtubeUrl = await response.text();
+                    const cleanUrl = youtubeUrl.trim();
+                    
+                    // Direct redirect to YouTube
+                    window.location.replace(cleanUrl);
+                    
+                    return;
+                } catch (error) {
+                    console.error('Error opening YouTube link:', error);
+                    alert('Error opening YouTube video. Please try again.');
+                    window.history.back();
+                    return;
+                }
+            } else if (fileName.endsWith('.tubelist')) {
+                window.location.href = `playlist-viewer.html?url=${fileUrl}&name=${fileName}`;
+                return;
+            }
+
+            if (!fileUrl) {
+                window.location.href = 'dashboard.html';
+                return;
+            }
+
+            // Fetch user data for the header
+            try {
+                const userId = localStorage.getItem('currentUser');
+                const userResponse = await fetch(`https://kkanhwtltfaeduhsflmu.supabase.co/rest/v1/students?id=eq.${userId}`, {
+                    headers: {
+                        'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtrYW5od3RsdGZhZWR1aHNmbG11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM4NTc3MjUsImV4cCI6MjA1OTQzMzcyNX0.94kQ39S4LXMc_6E_gdspXyDz3dkPCubxLsGSV_2FPls'
+                    }
+                });
+                const userData = await userResponse.json();
+                
+                if (userData && userData.length > 0) {
+                    const user = userData[0];
+                    document.getElementById('userName').innerHTML = `<i class="fas fa-user-circle mr-2"></i>${user.name}`;
+                }
+            } catch (error) {
+                console.error('Error fetching username:', error);
+            }
+
+            // Set document title and icon
+            const fileExt = fileName.split('.').pop().toLowerCase();
+            document.getElementById('docTitle').textContent = fileName || 'Document';
+            document.getElementById('fileType').textContent = getFileType(fileExt);
+            document.getElementById('fileTypeIcon').innerHTML = getFileIcon(fileExt);
+
+            try {
+                const response = await fetch(fileUrl, {
+                    headers: {
+                        'Authorization': 'Bearer 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',
+                        'Accept': 'application/vnd.github.v3+json'
+                    }
+                });
+                const data = await response.json();
+                const rawUrl = data.download_url;
+                
+                const supportedFormats = ['pdf', 'doc', 'docx', 'ppt', 'pptx', 'xls', 'xlsx', 'txt', 'md'];
+                
+                if (supportedFormats.includes(fileExt)) {
+                    const googleViewerUrl = `https://docs.google.com/gview?url=${encodeURIComponent(rawUrl)}&embedded=true`;
+                    docContent.innerHTML = `<iframe src="${googleViewerUrl}" width="100%" height="100%" frameborder="0" onload="hideLoading()"></iframe>`;
+                } else {
+                    const githubPreviewUrl = data.html_url;
+                    docContent.innerHTML = `<iframe src="${githubPreviewUrl}" width="100%" height="100%" frameborder="0" onload="hideLoading()"></iframe>`;
+                }
+            } catch (error) {
+                console.error('Error loading document:', error);
+                hideLoading();
+                docContent.innerHTML = `
+                    <div class="text-center p-8">
+                        <i class="fas fa-exclamation-circle text-4xl text-red-500 mb-4"></i>
+                        <div class="text-red-500 text-xl font-medium">Error loading document</div>
+                        <p class="text-gray-600 mt-2">Please try again later</p>
+                    </div>
+                `;
+            }
+        });
+
+        function hideLoading() {
+            document.getElementById('loadingIndicator').style.display = 'none';
+        }
+
+        function getFileIcon(ext) {
+            const icons = {
+                pdf: '<i class="fas fa-file-pdf text-red-500 text-2xl"></i>',
+                doc: '<i class="fas fa-file-word text-blue-500 text-2xl"></i>',
+                docx: '<i class="fas fa-file-word text-blue-500 text-2xl"></i>',
+                ppt: '<i class="fas fa-file-powerpoint text-orange-500 text-2xl"></i>',
+                pptx: '<i class="fas fa-file-powerpoint text-orange-500 text-2xl"></i>',
+                xls: '<i class="fas fa-file-excel text-green-500 text-2xl"></i>',
+                xlsx: '<i class="fas fa-file-excel text-green-500 text-2xl"></i>',
+                txt: '<i class="fas fa-file-alt text-gray-500 text-2xl"></i>',
+                md: '<i class="fas fa-file-code text-purple-500 text-2xl"></i>',
+                default: '<i class="fas fa-file text-gray-500 text-2xl"></i>'
+            };
+            return icons[ext] || icons.default;
+        }
+
+        function getFileType(ext) {
+            const types = {
+                pdf: 'PDF Document',
+                doc: 'Word Document',
+                docx: 'Word Document',
+                ppt: 'PowerPoint Presentation',
+                pptx: 'PowerPoint Presentation',
+                xls: 'Excel Spreadsheet',
+                xlsx: 'Excel Spreadsheet',
+                txt: 'Text Document',
+                md: 'Markdown Document',
+                default: 'Document'
+            };
+            return types[ext] || types.default;
+        }
+
+        async function deleteFile() {
+            if (!confirm('Are you sure you want to delete this file? This action cannot be undone.')) {
+                return;
+            }
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const fileUrl = urlParams.get('url');
+
+            try {
+                // Get file metadata to get the SHA
+                const response = await fetch(fileUrl, {
+                    headers: {
+                        'Authorization': 'Bearer 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',
+                        'Accept': 'application/vnd.github.v3+json'
+                    }
+                });
+                const data = await response.json();
+
+                // Delete the file
+                const deleteResponse = await fetch(fileUrl, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': 'Bearer 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',
+                        'Accept': 'application/vnd.github.v3+json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        message: 'Delete file',
+                        sha: data.sha,
+                        committer: {
+                            name: 'DSACE LMS Bot',
+                            email: 'lms-bot@dsace.edu'
+                        }
+                    })
+                });
+
+                if (!deleteResponse.ok) {
+                    throw new Error('Failed to delete file');
+                }
+
+                alert('File deleted successfully!');
+                history.back();
+            } catch (error) {
+                console.error('Error deleting file:', error);
+                alert('Failed to delete file. Please try again.');
+            }
+        }
+
+        async function renameFile() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const fileUrl = urlParams.get('url');
+            const currentName = urlParams.get('name');
+            
+            const newName = prompt('Enter new file name:', currentName);
+            if (!newName || newName === currentName) {
+                return;
+            }
+
+            try {
+                // Get current file content and metadata
+                const response = await fetch(fileUrl, {
+                    headers: {
+                        'Authorization': 'Bearer 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',
+                        'Accept': 'application/vnd.github.v3+json'
+                    }
+                });
+                const data = await response.json();
+
+                // Extract base URL from the current fileUrl (everything before 'contents/')
+                const baseUrlMatch = fileUrl.match(/(.*?\/contents\/)/);
+                if (!baseUrlMatch) {
+                    throw new Error('Invalid file URL format');
+                }
+                const baseUrl = baseUrlMatch[1];
+
+                // Get the directory path and create new path
+                const pathParts = data.path.split('/');
+                pathParts.pop(); // Remove the current filename
+                const newPath = [...pathParts, newName].join('/');
+
+                // Create new file with the same content at new path
+                const createResponse = await fetch(`${baseUrl}${newPath}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': 'Bearer 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',
+                        'Accept': 'application/vnd.github.v3+json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        message: `Rename file from ${currentName} to ${newName}`,
+                        content: data.content,
+                        committer: {
+                            name: 'DSACE LMS Bot',
+                            email: 'lms-bot@dsace.edu'
+                        }
+                    })
+                });
+
+                if (!createResponse.ok) {
+                    throw new Error('Failed to create new file');
+                }
+
+                const createResponseData = await createResponse.json();
+
+                // Delete the old file
+                const deleteResponse = await fetch(fileUrl, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': 'Bearer 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',
+                        'Accept': 'application/vnd.github.v3+json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        message: `Delete old file ${currentName}`,
+                        sha: data.sha,
+                        committer: {
+                            name: 'DSACE LMS Bot',
+                            email: 'lms-bot@dsace.edu'
+                        }
+                    })
+                });
+
+                if (!deleteResponse.ok) {
+                    throw new Error('Failed to delete old file');
+                }
+
+                alert('File renamed successfully!');
+                // Redirect to the new file
+                window.location.href = `doc-viewer.html?url=${encodeURIComponent(createResponseData.url)}&name=${encodeURIComponent(newName)}`;
+            } catch (error) {
+                console.error('Error renaming file:', error);
+                alert('Failed to rename file. Please try again.');
+            }
+        }
+    </script>
+</body>
+</html>
